@@ -1,32 +1,25 @@
-# Heroku Buildpack for npm Authentication
+# Heroku Buildpack for Scoped Private Github Registry
 
 This is a Heroku buildpack that enables authenticated npm operations
-within a Heroku dyno.
+within a Heroku dyno to a Github Package rEgistry
 
-It detects an `NPM_AUTH_TOKEN` environment variable and creates a `.npmrc` file.
+It detects an `NPM_AUTH_TOKEN` and `NPM_SCOPE_PACKAGE` environment variable and creates a `.npmrc` file that authenticates packages with `NPM_SCOPE_PACKAGE` as the scope.
 
-It is the soul sister of the [GitHub Buildpack](https://github.com/zeke/github-buildpack).
-
-See the blog post: [npm and GitHub automation with Heroku](http://zeke.sikelianos.com/npm-and-github-automation-with-heroku)
+It is a fork from [NPM Authenticated Buildpack](https://github.com/nice-registry/npm-buildpack)
 
 ## Usage
-
-Use this one-liner to read your [npm auth token](http://blog.npmjs.org/post/118393368555/deploying-with-npm-private-modules):
-
-```sh
-cat ~/.npmrc | head -1 | sed 's/.*=//g'
-```
 
 Save the token in your Heroku app config:
 
 ```sh
-heroku config:set NPM_AUTH_TOKEN=YOUR_TOKEN_HERE
+heroku config:set NPM_AUTH_TOKEN=GITHUB_TOKEN
+heroku config:set NPM_SCOPE_PACKAGE=SCOPE
 ```
 
 Configure your app to use this buildpack:
 
 ```sh
-heroku buildpacks:add --index 1 zeke/npm
+heroku buildpacks:add --index 1 gosynthschool/github-registry-scoped-buildpack
 ```
 
 The next time you push your app to Heroku, this buildpack will create a
@@ -35,7 +28,9 @@ The next time you push your app to Heroku, this buildpack will create a
 ```sh
 heroku run bash
 cat .npmrc
-//registry.npmjs.org/:_authToken=00000000-0000-0000-0000-000000000000
+
+@yourscope:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=00000000-0000-0000-0000-000000000000
 ```
 
 Now you can perform authenticated npm operations on the dyno, including
@@ -58,12 +53,4 @@ set the following in your app environment:
 
 ```sh
 heroku config:set NPM_CONFIG_PRODUCTION=false
-```
-
-## Using the latest source code
-
-The `zeke/npm` buildpack from the [Heroku Buildpack Registry](https://devcenter.heroku.com/articles/buildpack-registry) represents the latest stable version of the buildpack. If you'd like to use the source code from this Github repository, you can set your buildpack to the Github URL:
-
-```sh-session
-$ heroku buildpacks:set https://github.com/nice-registry/npm-buildpack
 ```

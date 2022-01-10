@@ -1,4 +1,4 @@
 #!/bin/sh
 
-echo "zeke/npm-buildpack"
+echo "gosynthschool/github-registry-scoped-buildpack"
 exit 0
